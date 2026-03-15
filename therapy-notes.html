@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapie Notizen</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f2ee;
+    --surface: #ffffff;
+    --border: #e2ddd7;
+    --text: #1c1a17;
+    --muted: #8c867d;
+    --soft: #ede9e3;
+    --amber: #b8693a;
+    --green: #4a8c72;
+    --lilac: #7060a8;
+    --amber-dim: rgba(184,105,58,0.07);
+    --green-dim: rgba(74,140,114,0.07);
+    --lilac-dim: rgba(112,96,168,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+
+  aside {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 40px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 24px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  nav { padding: 24px 0; flex: 1; }
+
+  .nav-group-label {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 24px 10px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-size: 13.5px;
+    color: var(--muted);
+    border-left: 2px solid transparent;
+    font-weight: 400;
+  }
+
+  .nav-item:hover { background: var(--soft); color: var(--text); }
+
+  .nav-item.active { color: var(--text); background: var(--soft); }
+  .nav-item[data-tab="denken"].active    { border-left-color: var(--green); }
+  .nav-item[data-tab="denken"].active .nav-dot { background: var(--green); }
+  .nav-item[data-tab="handeln"].active   { border-left-color: var(--amber); }
+  .nav-item[data-tab="handeln"].active .nav-dot { background: var(--amber); }
+  .nav-item[data-tab="ressourcen"].active { border-left-color: var(--lilac); }
+  .nav-item[data-tab="ressourcen"].active .nav-dot { background: var(--lilac); }
+  .nav-item[data-tab="kvt"].active       { border-left-color: var(--green); }
+  .nav-item[data-tab="kvt"].active .nav-dot { background: var(--green); }
+
+  .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  main { padding: 56px 60px 80px; max-width: 760px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn 0.2s ease; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .panel-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .c-amber { color: var(--amber); }
+  .c-green { color: var(--green); }
+  .c-lilac { color: var(--lilac); }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .panel-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 22px 24px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: #c8c0b4; }
+
+  .card.span2 { grid-column: span 2; }
+  .card.accent-amber { border-top: 2px solid var(--amber); }
+  .card.accent-green { border-top: 2px solid var(--green); }
+  .card.accent-lilac { border-top: 2px solid var(--lilac); }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .card p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .card p strong { color: var(--text); font-weight: 500; }
+
+  .quote-block {
+    margin: 32px 0;
+    padding: 20px 24px;
+    border-left: 2px solid var(--amber);
+    background: var(--amber-dim);
+    border-radius: 0 4px 4px 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .quote-block.green { border-left-color: var(--green); background: var(--green-dim); }
+  .quote-block.lilac { border-left-color: var(--lilac); background: var(--lilac-dim); }
+
+  .q-list {
+    margin-top: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .q-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.6;
+    transition: background 0.15s;
+  }
+
+  .q-item:last-child { border-bottom: none; }
+  .q-item:hover { background: var(--soft); }
+
+  .q-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--amber);
+    min-width: 20px;
+    padding-top: 2px;
+  }
+
+  .q-text { color: var(--text); }
+
+  .abc {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin: 32px 0 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .abc-item { padding: 20px; background: var(--surface); text-align: center; }
+
+  .abc-letter {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--green);
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .abc-word {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .abc-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  .divider { height: 1px; background: var(--border); margin: 36px 0; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+  .pill {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface);
+    transition: border-color 0.15s, color 0.15s;
+    cursor: default;
+  }
+
+  .pill:hover { border-color: var(--green); color: var(--green); }
+
+  @media (max-width: 700px) {
+    .shell { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 20px 0 0; }
+    nav { padding: 8px 0; display: flex; overflow-x: auto; }
+    .nav-group-label { display: none; }
+    .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; padding: 10px 16px; }
+    .nav-item.active { border-bottom-color: var(--amber); border-left: none; background: none; }
+    main { padding: 32px 20px 60px; }
+    .cards { grid-template-columns: 1fr; }
+    .card.span2 { grid-column: span 1; }
+    .abc { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside>
+    <div class="site-title">Meine Notizen</div>
+    <nav>
+      <div class="nav-group-label">Themen</div>
+      <div class="nav-item active" data-tab="denken"><span class="nav-dot"></span> Denkmuster</div>
+      <div class="nav-item" data-tab="handeln"><span class="nav-dot"></span> Handeln & Alltag</div>
+      <div class="nav-item" data-tab="ressourcen"><span class="nav-dot"></span> Ressourcen</div>
+      <div class="nav-item" data-tab="kvt"><span class="nav-dot"></span> KVT Grundlagen</div>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- DENKMUSTER -->
+    <div class="panel active" id="panel-denken">
+      <div class="panel-eyebrow c-green">Kognitives Arbeiten</div>
+      <h1 class="panel-title">Denkmuster</h1>
+      <p class="panel-desc">Wie ich mit meinen Gedanken umgehe — Muster erkennen, hinterfragen, umlenken.</p>
+
+      <div class="abc">
+        <div class="abc-item">
+          <span class="abc-letter">A</span>
+          <span class="abc-word">Activating Event</span>
+          <span class="abc-desc">Was ist passiert?</span>
+        </div>
+        <div class="abc-item">
+          <span class="abc-letter">B</span>
+          <span class="abc-word">Belief</span>
+          <span class="abc-desc">Was denke ich darüber?</span>
+        </div>
+        <div class="abc-item">
+          <span class="abc-letter">C</span>
+          <span class="abc-word">Consequences</span>
+          <span class="abc-desc">Was fühle / tue ich?</span>
+        </div>
+      </div>
+
+      <div class="quote-block green" style="margin-top: 14px;">
+        Beliefs hinterfragen → die Consequences verändern sich. Ich kann bei B ansetzen.
+      </div>
+
+      <div class="cards">
+        <div class="card accent-green">
+          <div class="card-label c-green">Umprogrammieren</div>
+          <h3>Autobahn vs. Waldweg</h3>
+          <p>Eingefahrene Muster sind wie Autobahnen im Gehirn. <strong>Bewusst die Bundesstraße nehmen</strong> — Dinge absichtlich anders machen, um neue Wege zu bahnen.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Perspektivwechsel</div>
+          <h3>Was würde ich einer Freundin raten?</h3>
+          <p>Wenn ich mich kleinrede oder katastrophisiere: <strong>raustreten und von außen schauen.</strong> Der Ratschlag gilt auch für mich.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Selbstmitgefühl</div>
+          <h3>Das innere Kind</h3>
+          <p>Verstehen, empathisch sein, trösten. <strong>Den Wünschen manchmal nachgeben</strong> — nicht immer kämpfen müssen.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Stopp-Technik</div>
+          <h3>Katastrophisieren unterbrechen</h3>
+          <p>Mich beim <strong>„Auspeitschen"</strong> erwischen — und es frühzeitig stoppen. Durchatmen, Wasserkontakt, klarer Kopf.</p>
+        </div>
+        <div class="card span2">
+          <div class="card-label c-green">Situationscheck</div>
+          <h3>Wie schlimm ist es wirklich?</h3>
+          <p>Vor einer Reaktion: <strong>kurze Pause, durchatmen, Wasserkontakt.</strong> Mit klarem Kopf ist die Situation meistens handhabbarer als im ersten Moment. Die meisten Krisen sind kein Notfall.</p>
+        </div>
+      </div>
+
+      <div class="quote-block green">
+        Möchte ich recht haben — oder möchte ich glücklich sein?
+      </div>
+    </div>
+
+    <!-- HANDELN -->
+    <div class="panel" id="panel-handeln">
+      <div class="panel-eyebrow c-amber">Verhalten</div>
+      <h1 class="panel-title">Handeln & Alltag</h1>
+      <p class="panel-desc">Wie ich meinen Tag gestalte — und was mich tatsächlich voranbringt.</p>
+
+      <div class="cards">
+        <div class="card accent-amber">
+          <div class="card-label c-amber">Grundprinzip</div>
+          <h3>Erst produzieren, dann konsumieren</h3>
+          <p>Bett machen, Reel schneiden, Fotos bearbeiten, malen, kochen — <strong>dann genießen.</strong> Nicht umgekehrt.</p>
+        </div>
+        <div class="card accent-amber">
+          <div class="card-label c-amber">Handeln schlägt Reden</div>
+          <h3>Gespräche sind nicht immer die Lösung</h3>
+          <p><strong>Manchmal ist Handeln wirksamer</strong> als alles Besprechen. Was kann ich jetzt konkret tun?</p>
+        </div>
+        <div class="card accent-amber">
+          <div class="card-label c-amber">Kleine Veränderungen</div>
+          <h3>Auch ohne Lust trotzdem tun</h3>
+          <p>Minimale Veränderungen helfen schon — <strong>z. B. Blumen kaufen.</strong> Mein Befinden darf mir Möglichkeiten nicht wegnehmen.</p>
+        </div>
+        <div class="card accent-amber">
+          <div class="card-label c-amber">Entscheidungen</div>
+          <h3>Informieren bis zur Entscheidung</h3>
+          <p>Bis die Entscheidung getroffen ist: informieren. <strong>Danach nicht mehr.</strong> Die Entscheidung steht.</p>
+        </div>
+        <div class="card span2">
+          <div class="card-label c-amber">Investition & Verbindung</div>
+          <h3>Worein stecke ich meine Zeit?</h3>
+          <p>Wenn ich schon Zeit investiere, dann in etwas Sinnvolles. <strong>Je mehr ich in etwas investiere, desto verbundener bin ich damit</strong> — also bewusst wählen, worauf ich Gedanken und Energie verwende. Will ich wirklich so verbunden damit sein?</p>
+        </div>
+      </div>
+
+      <div class="q-list">
+        <div class="q-item"><span class="q-num">01</span><span class="q-text">Was habe ich heute gemacht, damit ich mich besser fühle?</span></div>
+        <div class="q-item"><span class="q-num">02</span><span class="q-text">Wie nah bin ich am Sumpf? Was habe ich getan, um mich zu entfernen?</span></div>
+        <div class="q-item"><span class="q-num">03</span><span class="q-text">Was würde ich tun, wenn es mir gut gehen würde?</span></div>
+        <div class="q-item"><span class="q-num">04</span><span class="q-text">Wie wäre jemand voller Lebensenergie — wie käme er nach Hause, wie ginge er zur Arbeit?</span></div>
+        <div class="q-item"><span class="q-num">05</span><span class="q-text">Wieviel produziere ich täglich für mich? (Kochen, malen, aufräumen, Klavier…)</span></div>
+        <div class="q-item"><span class="q-num">06</span><span class="q-text">Wie kann ich mir das Leben heute ein bisschen schöner machen?</span></div>
+      </div>
+
+      <div class="quote-block" style="margin-top: 32px;">
+        Berlin & Umwelt: „Das ist nicht mein Thema gerade." Ich kann mich abgrenzen, ohne mich schuldig zu fühlen.
+      </div>
+    </div>
+
+    <!-- RESSOURCEN -->
+    <div class="panel" id="panel-ressourcen">
+      <div class="panel-eyebrow c-lilac">Energie & Schutz</div>
+      <h1 class="panel-title">Ressourcen</h1>
+      <p class="panel-desc">Was mich trägt, schützt und auflädt — bevor die Batterie leer ist.</p>
+
+      <div class="quote-block lilac">
+        Nicht erst in der letzten Sekunde handeln. Ressourcen aufbauen, solange man noch Kraft hat.
+      </div>
+
+      <div class="cards">
+        <div class="card accent-lilac">
+          <div class="card-label c-lilac">Vielfalt</div>
+          <h3>Mehr als nur Sport</h3>
+          <p>Ressourcen breit aufstellen: <strong>neue Menschen kennenlernen, kreativ sein,</strong> verschiedene Kraftquellen entwickeln.</p>
+        </div>
+        <div class="card accent-lilac">
+          <div class="card-label c-lilac">Proaktiv</div>
+          <h3>Nicht nur wenn's schlecht geht</h3>
+          <p>Dinge tun, wenn es einem gut geht — <strong>nicht nur als Notfallmaßnahme.</strong> Ressourcen präventiv pflegen.</p>
+        </div>
+        <div class="card accent-lilac">
+          <div class="card-label c-lilac">Wachstum</div>
+          <h3>Vom Azubi zur Expertin</h3>
+          <p>Weiterentwicklung ist ein Prozess: erst lernen, dann kompetent, dann führend. <strong>Neue Dinge ausprobieren</strong> ohne den Anspruch, sofort gut zu sein.</p>
+        </div>
+        <div class="card accent-lilac">
+          <div class="card-label c-lilac">Täglich</div>
+          <h3>Was produziere ich für mich?</h3>
+          <p>Aufräumen, kochen, malen, Klavier spielen. <strong>Kleine kreative Akte</strong> jeden Tag bauen Selbstwirksamkeit auf.</p>
+        </div>
+        <div class="card span2 accent-lilac">
+          <div class="card-label c-lilac">Weiterentwicklung</div>
+          <h3>Was ergänzt meine Arbeit sinnvoll?</h3>
+          <p>Was kann ich zeitnah starten, das mich beruflich und persönlich weiterbringt? <strong>Je mehr ich in etwas investiere, desto verbundener bin ich damit.</strong> Das gilt positiv wie negativ.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- KVT -->
+    <div class="panel" id="panel-kvt">
+      <div class="panel-eyebrow c-green">Verhaltenstherapie</div>
+      <h1 class="panel-title">KVT Grundlagen</h1>
+      <p class="panel-desc">Ergänzende Konzepte aus der kognitiven Verhaltenstherapie — zum Einordnen und Nachschlagen.</p>
+
+      <div class="cards">
+        <div class="card accent-green">
+          <div class="card-label c-green">Verhaltensaktivierung</div>
+          <h3>Erst tun, dann fühlen</h3>
+          <p>Motivation entsteht durch Handeln — nicht davor. <strong>Auf Lust zu warten</strong> hält die depressive Spirale am Laufen.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Kognitive Umstrukturierung</div>
+          <h3>Fakt oder Interpretation?</h3>
+          <p>Automatische Gedanken identifizieren. Fragen: <strong>Was spricht dafür — was dagegen?</strong> Gibt es eine andere Erklärung?</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Grübeln vs. Problemlösen</div>
+          <h3>Aus dem Kreis raus</h3>
+          <p>Grübeln dreht sich im Kreis. Problemlösen fragt: <strong>Was kann ich konkret tun?</strong> Wenn nichts — Gedanken loslassen und umlenken.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Exposition</div>
+          <h3>Vermeidung verstärkt Angst</h3>
+          <p>Dinge trotzdem tun — in kleinen Schritten. <strong>Das Gehirn lernt: Es ist aushaltbar.</strong></p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Selbstwirksamkeit</div>
+          <h3>Kleine Erfolge zählen</h3>
+          <p><strong>Was habe ich heute trotzdem geschafft?</strong> Jede überwundene Hürde trainiert das Vertrauen in die eigene Handlungsfähigkeit.</p>
+        </div>
+        <div class="card accent-green">
+          <div class="card-label c-green">Defusion</div>
+          <h3>Gedanken sind keine Fakten</h3>
+          <p>„Ich denke X" ≠ „X ist wahr." <strong>Gedanken beobachten wie Wolken</strong> — durchziehen lassen, nicht bekämpfen.</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="margin-bottom: 16px;">
+        <div class="panel-eyebrow c-green" style="margin-bottom: 8px;">Häufige Verzerrungen erkennen</div>
+        <p style="font-size: 13px; color: var(--muted); line-height: 1.6;">Welches Muster steckt gerade dahinter?</p>
+      </div>
+      <div class="pills">
+        <span class="pill">Schwarz-Weiß-Denken</span>
+        <span class="pill">Katastrophisieren</span>
+        <span class="pill">Gedankenlesen</span>
+        <span class="pill">Übergeneralisierung</span>
+        <span class="pill">Personalisierung</span>
+        <span class="pill">Emotionales Schlussfolgern</span>
+        <span class="pill">Gedankenfilter</span>
+        <span class="pill">Positives entwerten</span>
+        <span class="pill">Vorschnelle Schlüsse</span>
+        <span class="pill">Etikettieren</span>
+      </div>
+
+      <div class="quote-block green" style="margin-top: 32px;">
+        KVT-Grundsatz: Gedanken, Gefühle und Verhalten beeinflussen sich gegenseitig. An jedem der drei Punkte kann ich ansetzen.
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('panel-' + item.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
