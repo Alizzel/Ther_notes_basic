@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Therapie Notizen</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f2ee;color:#1c1a17;min-height:100vh}
+.wrap{display:flex;min-height:100vh}
+.sidebar{width:200px;flex-shrink:0;border-right:1px solid #e2ddd7;background:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.logo{padding:20px 18px 16px;border-bottom:1px solid #e2ddd7}
+.logo-mark{display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:#1D9E75}
+.logo-text{font-size:12px;font-weight:500;color:#8c867d;letter-spacing:0.04em}
+nav{padding:12px 0;flex:1}
+.nb{display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;background:none;border:none;border-left:2px solid transparent;cursor:pointer;font-size:13px;color:#8c867d;text-align:left;transition:all 0.15s}
+.nb:hover{background:#f4f2ee;color:#1c1a17}
+.nb.on{color:#1c1a17;background:#f4f2ee}
+.nb.on.g{border-left-color:#1D9E75}.nb.on.a{border-left-color:#BA7517}.nb.on.p{border-left-color:#7F77DD}
+.ni{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f4f2ee;border:1px solid #e2ddd7}
+.nb.on .ni{border-color:transparent}
+.nb.on.g .ni{background:#EAF3DE}.nb.on.a .ni{background:#FAEEDA}.nb.on.p .ni{background:#EEEDFE}
+.nb.on.g .ni svg{stroke:#3B6D11}.nb.on.a .ni svg{stroke:#854F0B}.nb.on.p .ni svg{stroke:#534AB7}
+.content{flex:1;padding:32px 40px 60px;max-width:820px}
+.panel{display:none}.panel.on{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:6px}
+.eg{color:#3B6D11}.ea{color:#854F0B}.ep{color:#534AB7}
+.ptitle{font-size:24px;font-weight:500;color:#1c1a17;line-height:1.25}
+.pdesc{font-size:13px;color:#8c867d;line-height:1.6;margin-top:4px}
+.hero-icon{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hg{background:#EAF3DE}.ha{background:#FAEEDA}.hp{background:#EEEDFE}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.card{background:#fff;border:1px solid #e2ddd7;border-radius:10px;padding:14px 16px;transition:border-color 0.15s}
+.card:hover{border-color:#c8c0b4}
+.card.s2{grid-column:span 2}
+.cicon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.cig{background:#EAF3DE}.cia{background:#FAEEDA}.cip{background:#EEEDFE}
+.clabel{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px}
+.card h3{font-size:13px;font-weight:500;color:#1c1a17;margin-bottom:5px;line-height:1.3}
+.card p{font-size:12.5px;line-height:1.6;color:#8c867d}
+.card p b{color:#1c1a17;font-weight:500}
+.abc-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.abc-cell{background:#fff;border:1px solid #e2ddd7;border-radius:10px;padding:14px 12px;text-align:center}
+.abc-l{font-size:26px;font-weight:500;color:#1D9E75;display:block;line-height:1;margin-bottom:4px}
+.abc-w{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8c867d;display:block;margin-bottom:3px}
+.abc-d{font-size:11.5px;color:#8c867d}
+.qb{padding:12px 16px;border-radius:0 8px 8px 0;font-size:13px;line-height:1.65;color:#1c1a17;margin-bottom:16px}
+.qb.qg{border-left:2px solid #1D9E75;background:#EAF3DE66}
+.qb.qa{border-left:2px solid #BA7517;background:#FAEEDA66}
+.qb.qp{border-left:2px solid #7F77DD;background:#EEEDFE66}
+.qlist{border:1px solid #e2ddd7;border-radius:10px;overflow:hidden;margin-bottom:16px}
+.qi{display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-bottom:1px solid #e2ddd7;font-size:12.5px;line-height:1.5;transition:background 0.12s}
+.qi:last-child{border-bottom:none}
+.qi:hover{background:#f4f2ee}
+.qn{font-size:11px;font-weight:500;color:#BA7517;min-width:16px;padding-top:1px;flex-shrink:0}
+.divider{height:1px;background:#e2ddd7;margin:20px 0}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pill{padding:4px 11px;border:1px solid #c8c0b4;border-radius:20px;font-size:11.5px;color:#8c867d;cursor:default;transition:all 0.12s}
+.pill:hover{border-color:#1D9E75;color:#3B6D11;background:#EAF3DE}
+.road{display:flex;align-items:stretch;gap:0;margin-bottom:16px}
+.road-col{flex:1;display:flex;flex-direction:column}
+.road-label{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:8px 12px;border-radius:8px 8px 0 0;text-align:center}
+.road-label.rg{background:#EAF3DE;color:#3B6D11}.road-label.ra{background:#FAEEDA;color:#854F0B}
+.road-vs{width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid #e2ddd7;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#8c867d;flex-shrink:0;margin:0 8px;align-self:center}
+.road-items{display:flex;flex-direction:column;gap:4px;padding:8px;background:#f4f2ee;border-radius:0 0 8px 8px;flex:1}
+.road-item{background:#fff;border:1px solid #e2ddd7;border-radius:6px;padding:7px 10px;font-size:12px;color:#8c867d}
+.road-item b{color:#1c1a17;font-weight:500;display:block;font-size:12px;margin-bottom:1px}
+.charge-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:#fff;border:1px solid #e2ddd7;border-radius:10px}
+.battery{width:48px;height:24px;position:relative;border:2px solid #7F77DD;border-radius:4px;flex-shrink:0}
+.battery::after{content:'';position:absolute;right:-5px;top:50%;transform:translateY(-50%);width:3px;height:10px;background:#7F77DD;border-radius:0 2px 2px 0}
+.battery-fill{position:absolute;left:2px;top:2px;bottom:2px;background:#7F77DD;border-radius:2px;transition:width 0.8s ease}
+.charge-text{font-size:12.5px;color:#8c867d;line-height:1.55}
+.charge-text b{color:#1c1a17;font-weight:500}
+.flow-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:16px;background:#fff;border:1px solid #e2ddd7;border-radius:10px}
+.flow-col{flex:1;text-align:center;padding:12px;background:#f4f2ee;border-radius:8px}
+.flow-col-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#8c867d;margin-bottom:8px}
+.flow-tag{font-size:11.5px;font-weight:500;padding:4px 8px;border-radius:6px;margin-bottom:4px;display:block}
+.flow-tag.fa{color:#854F0B;background:#FAEEDA}
+.flow-tag.fg{color:#3B6D11;background:#EAF3DE}
+.flow-arrow{font-size:20px;color:#c8c0b4;flex-shrink:0}
+@media(max-width:640px){
+  .wrap{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static}
+  nav{display:flex;overflow-x:auto;padding:4px 0}
+  .nb{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:10px 14px}
+  .nb.on{border-bottom-color:#1D9E75;border-left:none;background:none}
+  .nb.on.a{border-bottom-color:#BA7517}
+  .nb.on.p{border-bottom-color:#7F77DD}
+  .content{padding:20px 16px 40px}
+  .cards{grid-template-columns:1fr}
+  .card.s2{grid-column:span 1}
+  .abc-row{grid-template-columns:1fr}
+  .road{flex-direction:column;gap:8px}
+  .road-vs{align-self:center;margin:0}
+  .flow-wrap{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-dot"></div>
+      <div class="logo-text">Meine Notizen</div>
+    </div>
+  </div>
+  <nav>
+    <button class="nb on g" onclick="sw('denken',this)">
+      <div class="ni"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c867d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14Z"/></svg></div>
+      Denkmuster
+    </button>
+    <button class="nb a" onclick="sw('handeln',this)">
+      <div class="ni"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c867d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></svg></div>
+      Handeln & Alltag
+    </button>
+    <button class="nb p" onclick="sw('ressourcen',this)">
+      <div class="ni"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c867d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      Ressourcen
+    </button>
+    <button class="nb g" onclick="sw('kvt',this)">
+      <div class="ni"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8c867d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      KVT Grundlagen
+    </button>
+  </nav>
+</div>
+
+<div class="content">
+
+<div class="panel on" id="p-denken">
+  <div class="ph">
+    <div class="ph-text">
+      <div class="eyebrow eg">Kognitives Arbeiten</div>
+      <div class="ptitle">Denkmuster</div>
+      <div class="pdesc">Muster erkennen, hinterfragen, umlenken.</div>
+    </div>
+    <div class="hero-icon hg"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14Z"/></svg></div>
+  </div>
+  <div class="abc-row">
+    <div class="abc-cell"><span class="abc-l">A</span><span class="abc-w">Activating Event</span><span class="abc-d">Was ist passiert?</span></div>
+    <div class="abc-cell"><span class="abc-l">B</span><span class="abc-w">Belief</span><span class="abc-d">Was denke ich?</span></div>
+    <div class="abc-cell"><span class="abc-l">C</span><span class="abc-w">Consequences</span><span class="abc-d">Was fühle ich?</span></div>
+  </div>
+  <div class="qb qg">Bei <b>B ansetzen</b> — Beliefs hinterfragen → Consequences verändern sich.</div>
+  <div style="margin-bottom:10px">
+    <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#8c867d;margin-bottom:8px">Autobahn vs. Waldweg</div>
+    <div class="road">
+      <div class="road-col">
+        <div class="road-label rg">Waldweg</div>
+        <div class="road-items">
+          <div class="road-item"><b>Bewusst anders handeln</b>Neue Wege bahnen</div>
+          <div class="road-item"><b>Inneres Kind trösten</b>Empathisch sein</div>
+          <div class="road-item"><b>Freundinnen-Blick</b>Von außen schauen</div>
+        </div>
+      </div>
+      <div class="road-vs">vs</div>
+      <div class="road-col">
+        <div class="road-label ra">Autobahn</div>
+        <div class="road-items">
+          <div class="road-item"><b>Automatische Reaktion</b>Eingefahrenes Muster</div>
+          <div class="road-item"><b>Katastrophisieren</b>Auspeitschen</div>
+          <div class="road-item"><b>Selbstkritik</b>Kleinreden</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div><div class="clabel eg">Interpretation</div><h3>Wieviel Gewichtung gebe ich dem?</h3><p>Ich entscheide, wie viel Bedeutung ich etwas gebe — z. B. dem Schlaf, einer Aussage, einem schlechten Tag.</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div><div class="clabel eg">Akzeptanz</div><h3>So zu sein ist okay</h3><p>Nicht als Aufgabe, sondern als Ausgangspunkt. Von hier aus wachsen, ohne sich zuerst zu verurteilen.</p></div>
+    <div class="card s2"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="clabel eg">Sprache formt Selbstbild</div><h3>Was ich ausspreche, wird wahr</h3><p>„Ich kann nicht schlafen" stimmt oft nicht — vielleicht ist es „Ich hatte keine Lust." <b>Der Körper bestätigt, was ich mir selbst sage.</b> Worüber ich mich langfristig beklage, wird nicht korrigiert. Ich erwähne Dinge nur, wenn jemand helfen kann.</p></div>
+  </div>
+  <div class="qb qg">Möchte ich recht haben — oder möchte ich glücklich sein?</div>
+</div>
+
+<div class="panel" id="p-handeln">
+  <div class="ph">
+    <div class="ph-text">
+      <div class="eyebrow ea">Verhalten</div>
+      <div class="ptitle">Handeln & Alltag</div>
+      <div class="pdesc">Was mich tatsächlich voranbringt.</div>
+    </div>
+    <div class="hero-icon ha"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></svg></div>
+  </div>
+  <div class="flow-wrap">
+    <div class="flow-col">
+      <div class="flow-col-label">Erst</div>
+      <span class="flow-tag fa">Bett machen</span>
+      <span class="flow-tag fa">Reel schneiden</span>
+      <span class="flow-tag fa">Malen</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-col">
+      <div class="flow-col-label">Dann</div>
+      <span class="flow-tag fg">Scrollen</span>
+      <span class="flow-tag fg">Konsumieren</span>
+      <span class="flow-tag fg">Genießen</span>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="cicon cia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="clabel ea">Handeln schlägt Reden</div><h3>Manchmal ist Handeln wirksamer</h3><p>Gespräche sind nicht immer die beste Lösung. Was kann ich jetzt konkret tun?</p></div>
+    <div class="card"><div class="cicon cia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="clabel ea">Entscheidungen</div><h3>Informieren bis zur Entscheidung</h3><p>Bis die Entscheidung steht: informieren. Danach nicht mehr. Fertig.</p></div>
+    <div class="card s2"><div class="cicon cia"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#854F0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div class="clabel ea">Investition & Verbindung</div><h3>Worein stecke ich meine Zeit?</h3><p>Je mehr ich in etwas investiere, desto verbundener bin ich damit. <b>Will ich wirklich so verbunden damit sein?</b> Bewusst wählen, worauf Gedanken und Energie gehen.</p></div>
+  </div>
+  <div class="qlist">
+    <div class="qi"><span class="qn">01</span><span>Was habe ich heute gemacht, damit ich mich besser fühle?</span></div>
+    <div class="qi"><span class="qn">02</span><span>Wie nah bin ich am Sumpf? Was habe ich getan, um mich zu entfernen?</span></div>
+    <div class="qi"><span class="qn">03</span><span>Was würde ich tun, wenn es mir gut gehen würde?</span></div>
+    <div class="qi"><span class="qn">04</span><span>Wie wäre jemand voller Lebensenergie — wie käme er nach Hause?</span></div>
+    <div class="qi"><span class="qn">05</span><span>Wieviel produziere ich täglich für mich?</span></div>
+    <div class="qi"><span class="qn">06</span><span>Wie kann ich mir das Leben heute ein bisschen schöner machen?</span></div>
+  </div>
+  <div class="qb qa" style="margin-top:12px">„Das ist nicht mein Thema gerade." — Ich kann mich abgrenzen, ohne mich schuldig zu fühlen.</div>
+</div>
+
+<div class="panel" id="p-ressourcen">
+  <div class="ph">
+    <div class="ph-text">
+      <div class="eyebrow ep">Energie & Schutz</div>
+      <div class="ptitle">Ressourcen</div>
+      <div class="pdesc">Was mich trägt und auflädt — bevor die Batterie leer ist.</div>
+    </div>
+    <div class="hero-icon hp"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+  </div>
+  <div class="charge-wrap">
+    <div class="battery"><div class="battery-fill" id="bfill" style="width:20%"></div></div>
+    <div class="charge-text"><b>Nicht erst in der letzten Sekunde handeln.</b> Ressourcen aufbauen, solange noch Kraft da ist.</div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="cicon cip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="clabel ep">Neue Verbindungen</div><h3>Mehr als nur Sport</h3><p>Neue Menschen kennenlernen, kreativ sein — verschiedene Kraftquellen, damit keine einzelne wegbricht.</p></div>
+    <div class="card"><div class="cicon cip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg></div><div class="clabel ep">Proaktiv</div><h3>Nicht nur wenn's schlecht geht</h3><p>Ressourcen auch dann pflegen, wenn es einem gut geht — nicht nur als Notfallmaßnahme.</p></div>
+    <div class="card"><div class="cicon cip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div class="clabel ep">Wachstum</div><h3>Vom Azubi zur Expertin</h3><p>Erst lernen, dann kompetent, dann führend. Neue Dinge ausprobieren — ohne sofort gut sein zu müssen.</p></div>
+    <div class="card"><div class="cicon cip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div><div class="clabel ep">Waldweg — Selbstlob</div><h3>Mich selbst loben</h3><p>Aktiv und bewusst: <b>Was habe ich heute gut gemacht?</b> Nicht warten, bis jemand anderes es tut.</p></div>
+    <div class="card s2"><div class="cicon cip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="clabel ep">Täglich produzieren</div><h3>Was schaffe ich heute für mich?</h3><p>Aufräumen, kochen, malen, Klavier spielen — kleine kreative Akte bauen Selbstwirksamkeit auf. <b>Je mehr ich investiere, desto verbundener bin ich damit.</b> Bewusst wählen.</p></div>
+  </div>
+</div>
+
+<div class="panel" id="p-kvt">
+  <div class="ph">
+    <div class="ph-text">
+      <div class="eyebrow eg">Verhaltenstherapie</div>
+      <div class="ptitle">KVT Grundlagen</div>
+      <div class="pdesc">Konzepte zum Einordnen und Nachschlagen.</div>
+    </div>
+    <div class="hero-icon hg"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="clabel eg">Verhaltensaktivierung</div><h3>Erst tun, dann fühlen</h3><p>Motivation entsteht durch Handeln — nicht davor. Auf Lust zu warten hält die Spirale am Laufen.</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="clabel eg">Kognitive Umstrukturierung</div><h3>Fakt oder Interpretation?</h3><p>Was spricht dafür — was dagegen? Gibt es eine andere Erklärung?</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><div class="clabel eg">Grübeln vs. Problemlösen</div><h3>Aus dem Kreis raus</h3><p>Grübeln dreht sich im Kreis. Problemlösen fragt: Was kann ich konkret tun?</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div><div class="clabel eg">Exposition</div><h3>Vermeidung verstärkt Angst</h3><p>Dinge trotzdem tun — in kleinen Schritten. Das Gehirn lernt: Es ist aushaltbar.</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="clabel eg">Selbstwirksamkeit</div><h3>Kleine Erfolge zählen</h3><p>Was habe ich heute trotzdem geschafft? Jede Hürde trainiert das Vertrauen in sich selbst.</p></div>
+    <div class="card"><div class="cicon cig"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3B6D11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></div><div class="clabel eg">Defusion</div><h3>Gedanken sind keine Fakten</h3><p>„Ich denke X" ≠ „X ist wahr." Gedanken wie Wolken beobachten — durchziehen lassen.</p></div>
+  </div>
+  <div class="divider"></div>
+  <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#3B6D11;margin-bottom:4px">Häufige Verzerrungen</div>
+  <div style="font-size:12.5px;color:#8c867d;margin-bottom:8px">Welches Muster steckt gerade dahinter?</div>
+  <div class="pills">
+    <span class="pill">Schwarz-Weiß-Denken</span><span class="pill">Katastrophisieren</span><span class="pill">Gedankenlesen</span><span class="pill">Übergeneralisierung</span><span class="pill">Personalisierung</span><span class="pill">Emotionales Schlussfolgern</span><span class="pill">Gedankenfilter</span><span class="pill">Positives entwerten</span><span class="pill">Vorschnelle Schlüsse</span><span class="pill">Etikettieren</span>
+  </div>
+  <div class="qb qg" style="margin-top:16px">KVT-Grundsatz: Gedanken, Gefühle und Verhalten beeinflussen sich gegenseitig. An jedem der drei Punkte kann ich ansetzen.</div>
+</div>
+
+</div>
+</div>
+
+<script>
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+window.addEventListener('load',function(){
+  var b=document.getElementById('bfill');
+  if(b){setTimeout(function(){b.style.width='72%'},400);}
+});
+</script>
+</body>
+</html>
